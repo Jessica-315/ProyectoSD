@@ -1,0 +1,85 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package sockets;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.net.Socket;
+import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+/**
+ *
+ * @author Jessica Castro
+ */
+public class ClienteHilo extends Thread{
+    
+    private DataInputStream in;
+    private DataOutputStream out;
+    private Socket sc;
+
+    public ClienteHilo(DataInputStream in, DataOutputStream out, Socket sc) {
+        this.in = in;
+        this.out = out;
+        this.sc = sc;
+    }
+    
+    @Override
+    public void run(){
+        
+        Scanner sn = new Scanner(System.in);
+        
+        String mensaje;
+        int opcion = 0;
+        boolean salir = false;
+        
+        while(!salir){
+            try {
+                System.out.println("1. Almacenar numero en el archivo");
+                System.out.println("2. Mandar mensaje");
+                System.out.println("3. Salir");
+                
+                opcion = sn.nextInt();
+                out.writeInt(opcion);
+                
+                switch (opcion) {
+                    case 1:
+                        int numeroAleatorio = generaNumeroAleatorio(1, 100);
+                        System.out.println("Numero generado: " + numeroAleatorio);
+                        out.writeInt(numeroAleatorio);
+                        mensaje = in.readUTF();
+                        System.out.println(mensaje);
+                        break;
+                    case 2:
+                        
+                        break;
+                    case 3:
+                        mensaje = "Desconectando";
+                        out.writeUTF(mensaje);
+                        sc.close();
+                        salir = true;
+                        break;
+                    default:
+                        mensaje = in.readUTF();
+                        System.out.println(mensaje);
+                }
+            } catch (IOException ex) {
+                Logger.getLogger(ClienteHilo.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
+        }
+        
+    }
+    
+    public int generaNumeroAleatorio(int minimo, int maximo){
+        return (int)Math.floor(Math.random() * (maximo-minimo+1) + (minimo));
+    }
+    
+}
