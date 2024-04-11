@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.Socket;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -62,10 +63,28 @@ public class ServidorHilo extends Thread{
                         String ip = in.readUTF();
                         out.writeUTF("Puerto:");
                         int puerto = in.readInt();
-                        System.out.println(puerto);
+                        System.out.println(nombreCliente + " manda mensaje a " + ip);
+                        
                         Socket ss = new Socket(ip, puerto);
                         DataOutputStream outOut = new DataOutputStream(ss.getOutputStream());   // Reenvio de informacion al cliente destino
-                        outOut.writeUTF(mensaje);
+                        DataInputStream inIn = new DataInputStream(ss.getInputStream());
+                        
+                        LocalDateTime locaDate = LocalDateTime.now();
+                        int hours  = locaDate.getHour();
+                        int minutes = locaDate.getMinute();
+                        int seconds = locaDate.getSecond();
+                        
+                        String conversacion = nombreCliente + ": " + mensaje + " (Hora: " + hours  + ":"+ minutes +":"+ seconds + ")";
+                        
+                        outOut.writeUTF(conversacion);
+                        String confirmacion = inIn.readUTF();
+                        
+                        out.writeUTF(confirmacion);
+                        
+                        System.out.println(in.readUTF());
+                        out.writeUTF(conversacion + '\n' + confirmacion); // Se almacena la conversacion
+                        
+                        inIn.close();
                         outOut.close();
                         ss.close();
                         break;

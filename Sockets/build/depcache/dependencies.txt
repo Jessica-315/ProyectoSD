@@ -10,8 +10,8 @@ java.util.logging.Level
 java.lang.System
 java.io.PrintStream
 java.util.logging.Logger
-java.io.IOException
 java.lang.Object
+java.io.IOException
 [Ljava.lang.String;
 java.net.ServerSocket
 sockets.Servidor
@@ -34,6 +34,7 @@ java.lang.System
 java.io.PrintStream
 java.io.FileWriter
 java.util.logging.Logger
+java.time.LocalDateTime
 java.io.IOException
 ||:sockets.ClienteServidorHilo
 java.net.Socket
@@ -42,9 +43,11 @@ java.lang.Thread
 java.io.DataInputStream
 java.lang.Class
 java.util.logging.Level
+java.io.DataOutputStream
 java.io.PrintStream
 java.lang.System
 java.util.logging.Logger
+java.time.LocalDateTime
 sockets.ClienteServidorHilo
 java.io.IOException
 java.net.ServerSocket
@@ -52,14 +55,16 @@ java.net.ServerSocket
 java.net.Socket
 java.lang.StringBuilder
 java.lang.Thread
+java.io.File
 java.lang.Math
 sockets.ClienteHilo
 java.io.DataInputStream
 java.lang.Class
 java.io.DataOutputStream
 java.util.logging.Level
-java.io.PrintStream
 java.lang.System
+java.io.PrintStream
+java.io.FileWriter
 java.util.logging.Logger
 java.util.Scanner
 java.io.IOException

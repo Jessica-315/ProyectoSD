@@ -61,9 +61,9 @@ public class Cliente {
             pData.writeObject(dataOut); //  <-------------------*/
             
             int puertoRandom = generaPuertoAleatorio(5001, 5100);
-            Thread hiloEscucha = new Thread(new ClienteServidorHilo(puertoRandom));
+            Thread hiloEscucha = new Thread(new ClienteServidorHilo(puertoRandom, ip, nombre));
             //ClienteServidorHilo hiloEscucha = new ClienteServidorHilo();
-            ClienteHilo hiloMenu = new ClienteHilo(in, out, sc, puertoRandom);
+            ClienteHilo hiloMenu = new ClienteHilo(in, out, sc, puertoRandom, nombre);
             hiloEscucha.start();
             hiloMenu.start();
             hiloMenu.join();

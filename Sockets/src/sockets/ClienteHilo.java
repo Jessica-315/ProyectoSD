@@ -27,12 +27,14 @@ public class ClienteHilo extends Thread{
     private DataOutputStream out;
     private Socket sc;
     private int pr;
+    private String nombre;
 
-    public ClienteHilo(DataInputStream in, DataOutputStream out, Socket sc, int pr) {
+    public ClienteHilo(DataInputStream in, DataOutputStream out, Socket sc, int pr, String nombre) {
         this.in = in;
         this.out = out;
         this.sc = sc;
         this.pr = pr;
+        this.nombre = nombre;
     }
     
     @Override
@@ -43,6 +45,8 @@ public class ClienteHilo extends Thread{
         String mensaje;
         int opcion = 0;
         boolean salir = false;
+        
+        File f = new File("Conversaciones-" + nombre + ".txt");
 
 
         while(!salir){
@@ -71,6 +75,11 @@ public class ClienteHilo extends Thread{
                         out.writeUTF(mensaje);
                         System.out.println(in.readUTF());
                         out.writeInt(sn.nextInt());
+                        System.out.println(in.readUTF());   // Confirmacion de recibido
+                        
+                        out.writeUTF("Mensaje almacenado");
+                        almacenarMensaje(f, in.readUTF());
+                        
                         break;
                     case 3:
                         mensaje = "Desconectando";
@@ -119,6 +128,14 @@ public class ClienteHilo extends Thread{
     
     public int generaNumeroAleatorio(int minimo, int maximo){
         return (int)Math.floor(Math.random() * (maximo-minimo+1) + (minimo));
+    }
+    
+    public void almacenarMensaje(File f, String mensaje) throws IOException{
+        
+        FileWriter fw = new FileWriter(f, true);
+        fw.write(mensaje + "\r\n");
+        fw.close();
+        
     }
     
 }

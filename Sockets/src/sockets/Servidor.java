@@ -76,9 +76,9 @@ public class Servidor {
                 /*System.out.println("Creada la conexion con el cliente " + nombreCliente +
                 " con la direccion: " + listaClientesS.get(nC).getInetAddress() + 
                 " con el puerto: " + listaClientesS.get(nC).getLocalPort());*/
-                System.out.println("Creada la conexion con el cliente " + nombreCliente +
-                " con la direccion: " + ipCliente + 
-                " con el puerto: " + listaClientesS.get(nC-1).getLocalPort());
+                System.out.println("Creada la conexion con el cliente " + nombreCliente);// +
+                //" con la direccion: " + ipCliente + 
+                //" con el puerto: " + listaClientesS.get(nC-1).getLocalPort());
                 
                 nC += 1;
                 
