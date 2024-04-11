@@ -8,6 +8,8 @@ package sockets;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -29,10 +31,13 @@ public class Servidor {
             ServerSocket server = new ServerSocket(5000);
             Socket sc;
             
+            /*String nick, ip, mensaje;   //  <-------------------
+            PaqueteEnvio dataIn;    //  <-------------------*/
+            
             ArrayList<Socket> listaClientesS = new ArrayList<>();   // Lista de sockets
             ArrayList<String> listaClientesN = new ArrayList<>();   // Lista de nombres
-            int nC = 0; //Numero de cliente
-            //Paquete1 paquete_recibido;
+            ArrayList<String> listaClientesIP = new ArrayList<>();   // Lista de IPs
+            int nC = 1; //Numero de cliente
             
             System.out.println("Servidor iniciado");
             while(true){
@@ -43,26 +48,46 @@ public class Servidor {
                 DataInputStream in = new DataInputStream(sc.getInputStream());
                 DataOutputStream out = new DataOutputStream(sc.getOutputStream());
                 
-                //paquete_recibido=(Paquete1) in.readObject();
+                /*ObjectInputStream pData = new ObjectInputStream(sc.getInputStream());    //  <-------------------
+                dataIn = (PaqueteEnvio) pData.readObject(); //  <-------------------
                 
-                System.out.println("Nuevo cliente: " + nC);
+                nick = dataIn.getNick();    //  <-------------------
+                ip = dataIn.getIp();    //  <-------------------
+                mensaje = dataIn.getMensaje();  //  <-------------------
+                System.out.println(nick + ": " + mensaje + " para " + ip);  //  <-------------------
+                Socket ss = new Socket(ip, 5001);   //  <-------------------
+                ObjectOutputStream pData2Send = new ObjectOutputStream(sc.getOutputStream());    //  <-------------------
+                pData2Send.writeObject(dataIn);
+                pData2Send.close();
+                ss.close();
+                */
+                
+                System.out.println("Nuevo cliente (" + nC + ")");
                 out.writeUTF("Indica tu nombre");
                 String nombreCliente = in.readUTF();
+                out.writeUTF("Indica tu IP");
+                String ipCliente = in.readUTF();
                 
                 listaClientesN.add(nombreCliente);
+                listaClientesIP.add(ipCliente);
                 ServidorHilo hilo = new ServidorHilo(in, out, nombreCliente);
                 hilo.start();
                 
-                System.out.println("Creada la conexion con el cliente " + nombreCliente +
+                /*System.out.println("Creada la conexion con el cliente " + nombreCliente +
                 " con la direccion: " + listaClientesS.get(nC).getInetAddress() + 
-                " con el puerto: " + listaClientesS.get(nC).getLocalPort());
+                " con el puerto: " + listaClientesS.get(nC).getLocalPort());*/
+                System.out.println("Creada la conexion con el cliente " + nombreCliente +
+                " con la direccion: " + ipCliente + 
+                " con el puerto: " + listaClientesS.get(nC-1).getLocalPort());
                 
                 nC += 1;
                 
             }
         } catch (IOException ex){
             Logger.getLogger(Servidor.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        } /*catch (ClassNotFoundException ex) {
+            Logger.getLogger(Servidor.class.getName()).log(Level.SEVERE, null, ex);
+        }*/
         
     }
     
