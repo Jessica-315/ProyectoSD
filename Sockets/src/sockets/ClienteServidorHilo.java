@@ -17,19 +17,35 @@ import java.util.logging.Logger;
  * @author Jessica Castro
  */
 public class ClienteServidorHilo extends Thread{
+    
+    private int puerto;
+
+    public ClienteServidorHilo(int puerto) {
+        this.puerto = puerto;
+    }
+    
+    public int getPuerto() {
+        return puerto;
+    }
+    
     @Override
     public void run(){
         try {
             
-            ServerSocket server = new ServerSocket(5001);
-            System.out.println("El cliente está a la escucha");
+            ServerSocket server = new ServerSocket(puerto);
+            System.out.println("El cliente está a la escucha, puerto: " + puerto);
             
-            while(true){
+            boolean escucha = true;
+            
+            while(escucha){
                 
                 Socket sc = server.accept();
                 DataInputStream in = new DataInputStream(sc.getInputStream());
                 
-                System.out.println(in.readUTF());
+                System.out.println("Te envian: " + in.readUTF());
+                
+                //sc.close();
+                //escucha = false;
                 
             }
             

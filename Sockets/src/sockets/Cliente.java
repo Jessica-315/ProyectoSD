@@ -60,12 +60,14 @@ public class Cliente {
             ObjectOutputStream pData = new ObjectOutputStream(sc.getOutputStream()); //  <-------------------
             pData.writeObject(dataOut); //  <-------------------*/
             
-            Thread hiloEscucha = new Thread(new ClienteServidorHilo());
-            ClienteHilo hiloMenu = new ClienteHilo(in, out, sc);
+            int puertoRandom = generaPuertoAleatorio(5001, 5100);
+            Thread hiloEscucha = new Thread(new ClienteServidorHilo(puertoRandom));
+            //ClienteServidorHilo hiloEscucha = new ClienteServidorHilo();
+            ClienteHilo hiloMenu = new ClienteHilo(in, out, sc, puertoRandom);
             hiloEscucha.start();
             hiloMenu.start();
             hiloMenu.join();
-            //hiloEscucha.join();
+            hiloEscucha.join();
             
             //ClienteServidorHilo hiloEscucha = new ClienteServidorHilo();
             
@@ -76,6 +78,10 @@ public class Cliente {
             Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, ex);
         }
         
+    }
+    
+    public static int generaPuertoAleatorio(int minimo, int maximo){
+        return (int)Math.floor(Math.random() * (maximo-minimo+1) + (minimo));
     }
     
 }
@@ -113,3 +119,4 @@ class PaqueteEnvio implements Serializable { // Serializable significa que las i
     
     
 }
+

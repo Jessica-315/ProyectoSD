@@ -60,7 +60,10 @@ public class ServidorHilo extends Thread{
                         String mensaje = in.readUTF();
                         out.writeUTF("IP destino:");
                         String ip = in.readUTF();
-                        Socket ss = new Socket(ip, 5001);
+                        out.writeUTF("Puerto:");
+                        int puerto = in.readInt();
+                        System.out.println(puerto);
+                        Socket ss = new Socket(ip, puerto);
                         DataOutputStream outOut = new DataOutputStream(ss.getOutputStream());   // Reenvio de informacion al cliente destino
                         outOut.writeUTF(mensaje);
                         outOut.close();

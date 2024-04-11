@@ -26,11 +26,13 @@ public class ClienteHilo extends Thread{
     private DataInputStream in;
     private DataOutputStream out;
     private Socket sc;
+    private int pr;
 
-    public ClienteHilo(DataInputStream in, DataOutputStream out, Socket sc) {
+    public ClienteHilo(DataInputStream in, DataOutputStream out, Socket sc, int pr) {
         this.in = in;
         this.out = out;
         this.sc = sc;
+        this.pr = pr;
     }
     
     @Override
@@ -67,6 +69,8 @@ public class ClienteHilo extends Thread{
                         System.out.println(in.readUTF());
                         mensaje = sn.next();
                         out.writeUTF(mensaje);
+                        System.out.println(in.readUTF());
+                        out.writeInt(sn.nextInt());
                         break;
                     case 3:
                         mensaje = "Desconectando";
