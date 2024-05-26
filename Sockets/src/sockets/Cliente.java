@@ -7,9 +7,11 @@ package sockets;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.net.InetAddress;
 import java.net.Socket;
 import java.util.Scanner;
 import java.util.logging.Level;
@@ -29,48 +31,47 @@ public class Cliente {
         try {
             Scanner sn = new Scanner(System.in);
             sn.useDelimiter("\n");
-            String dir = "192.168.100.15";   // AQUI SE TIENE QUE SUSTITUIR LA IP POR LA DE LA MAQUINA DEL SERVIDOR
+            String dir = "192.168.152.130";   // AQUI SE TIENE QUE SUSTITUIR LA IP POR LA DE LA MAQUINA DEL SERVIDOR
             
             
             Socket sc = new Socket(dir, 5000);
-            PaqueteEnvio dataOut = new PaqueteEnvio();    //  <-------------------
-            
-            //PaqueteEnvio dataOut = new PaqueteEnvio();    //  <-------------------
             
             DataInputStream in = new DataInputStream(sc.getInputStream());
             DataOutputStream out = new DataOutputStream(sc.getOutputStream());
             
-            String mensaje = in.readUTF();
+            
+            String mensaje = in.readUTF();  // Nombre
             System.out.println(mensaje);
+            
+            int puertoRandom = 5011;//generaPuertoAleatorio(5001, 5100);
             
             String nombre = sn.next();
-            out.writeUTF(nombre);
-            dataOut.setNick(nombre);  //  <-------------------
+            out.writeUTF(nombre + "," + puertoRandom);
+
             
-            mensaje = in.readUTF();
-            System.out.println(mensaje);
+            String ip = in.readUTF();   // ---------->
             
-            String ip = sn.next();
-            out.writeUTF(ip);
-            dataOut.setNick(ip);  //  <-------------------
-            /*
-            dataOut.setNick(nombre);  //  <-------------------
-            dataOut.setIp("xxxx.xxxx.xxxx.xxxx");    //  <-------------------
-            dataOut.setMensaje("Hola!");  //  <-------------------
-            ObjectOutputStream pData = new ObjectOutputStream(sc.getOutputStream()); //  <-------------------
-            pData.writeObject(dataOut); //  <-------------------*/
             
-            int puertoRandom = generaPuertoAleatorio(5001, 5100);
-            Thread hiloEscucha = new Thread(new ClienteServidorHilo(puertoRandom, ip, nombre));
-            //ClienteServidorHilo hiloEscucha = new ClienteServidorHilo();
-            ClienteHilo hiloMenu = new ClienteHilo(in, out, sc, puertoRandom, nombre);
+
+            ClienteServidorHilo hiloEscucha = new ClienteServidorHilo(puertoRandom, ip, nombre);
+            
+            ClienteHilo hiloMenu = new ClienteHilo(in, out, sc, puertoRandom, ip, nombre, hiloEscucha);
+            
+            
+            
+            //hiloEscucha.setMo(ip);
             hiloEscucha.start();
             hiloMenu.start();
             hiloMenu.join();
             hiloEscucha.join();
             
-            //ClienteServidorHilo hiloEscucha = new ClienteServidorHilo();
+            /*
+            out.writeUTF("Verificando si es cliente nuevo");
+            String esNuevo = in.readUTF();
             
+            if(!esNuevo.equals("Nuevo")){
+                hiloEscucha.setMo(esNuevo);
+            }*/
             
         } catch (IOException ex) {
             Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, ex);
@@ -85,38 +86,3 @@ public class Cliente {
     }
     
 }
-
-
-class PaqueteEnvio implements Serializable { // Serializable significa que las instancias de este
-                                            // objeto se pueden convertir en bits para que puedan viajar por la red
-    
-    private String nick, ip, mensaje;
-
-    public String getNick() {
-        return nick;
-    }
-
-    public void setNick(String nick) {
-        this.nick = nick;
-    }
-
-    public String getIp() {
-        return ip;
-    }
-
-    public void setIp(String ip) {
-        this.ip = ip;
-    }
-
-    public String getMensaje() {
-        return mensaje;
-    }
-
-    public void setMensaje(String mensaje) {
-        this.mensaje = mensaje;
-    }
-    
-    
-    
-}
-

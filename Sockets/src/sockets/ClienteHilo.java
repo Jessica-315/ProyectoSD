@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -27,27 +28,32 @@ public class ClienteHilo extends Thread{
     private DataOutputStream out;
     private Socket sc;
     private int pr;
+    private String ip;
     private String nombre;
+    private ClienteServidorHilo hiloEscucha;
 
-    public ClienteHilo(DataInputStream in, DataOutputStream out, Socket sc, int pr, String nombre) {
+    public ClienteHilo(DataInputStream in, DataOutputStream out, Socket sc, int pr, 
+            String ip, String nombre, ClienteServidorHilo hiloEscucha) {
         this.in = in;
         this.out = out;
         this.sc = sc;
         this.pr = pr;
+        this.ip = ip;
         this.nombre = nombre;
+        this.hiloEscucha = hiloEscucha;
     }
     
     @Override
     public void run(){
         
         Scanner sn = new Scanner(System.in);
+        sn.useDelimiter("\n");
 
         String mensaje;
         int opcion = 0;
         boolean salir = false;
         
         File f = new File("Conversaciones-" + nombre + ".txt");
-
 
         while(!salir){
             try {
@@ -67,23 +73,32 @@ public class ClienteHilo extends Thread{
                         System.out.println(mensaje);
                         break;
                     case 2:
-                        System.out.println(in.readUTF());
-                        mensaje = sn.next();
-                        out.writeUTF(mensaje);
-                        System.out.println(in.readUTF());
-                        mensaje = sn.next();
-                        out.writeUTF(mensaje);
-                        System.out.println(in.readUTF());
-                        out.writeInt(sn.nextInt());
+                        
+                        System.out.println("Usuarios conectados:");
+                        for(int i = 0; i < hiloEscucha.getMoTotalUsr(); i++){
+                            System.out.println(i + 1 + "- " + hiloEscucha.getMo().split("/")[i].split(",")[0]);
+                        }
+                        
+                        System.out.println("\nMandar mensaje a usuario: ");
+                        int usr = sn.nextInt() - 1;
+                        
+                        System.out.println(in.readUTF());   // Mensaje
+                        mensaje = sn.next();                // 
+                        out.writeUTF(mensaje + "/" + 
+                                hiloEscucha.getMo().split("/")[usr].split(",")[1] + "/" +   // ip
+                                hiloEscucha.getMo().split("/")[usr].split(",")[2]);         // puerto
+                        
                         System.out.println(in.readUTF());   // Confirmacion de recibido
                         
-                        out.writeUTF("Mensaje almacenado");
+                        out.writeUTF("Historial almacenado");
                         almacenarMensaje(f, in.readUTF());
                         
                         break;
                     case 3:
-                        mensaje = "Desconectando";
+                        mensaje = "Desconectando...," + ip + "," + String.valueOf(pr); // "Desconectando";
                         out.writeUTF(mensaje);
+                        in.close();
+                        out.close();
                         sc.close();
                         salir = true;
                         break;
@@ -95,34 +110,10 @@ public class ClienteHilo extends Thread{
             } catch (IOException ex) {
                 Logger.getLogger(ClienteHilo.class.getName()).log(Level.SEVERE, null, ex);
             }
+             catch (NumberFormatException ex){
+            }
 
         }
-            
-            
-            
-            
-            /*try {   //  <-------------------
-            ServerSocket server = new ServerSocket(5001);   //  <-------------------
-            Socket sc;  //  <-------------------
-            
-            PaqueteEnvio dataIn;    //  <-------------------
-            
-            while(true) {   //  <-------------------
-            
-            sc = server.accept();   //  <-------------------
-            
-            ObjectInputStream pData = new ObjectInputStream(sc.getInputStream());    //  <-------------------
-            dataIn = (PaqueteEnvio) pData.readObject(); //  <-------------------
-            System.out.println(dataIn.getNick() + ": " + dataIn.getMensaje());  //  <-------------------
-                
-            }   //  <-------------------
-            
-            } catch (IOException ex) {  //  <-------------------
-            Logger.getLogger(ClienteHilo.class.getName()).log(Level.SEVERE, null, ex);  //  <-------------------
-            } catch (ClassNotFoundException ex) {
-            Logger.getLogger(ClienteHilo.class.getName()).log(Level.SEVERE, null, ex);  //  <-------------------
-            }   //  <-------------------*/
-
         
     }
     
@@ -137,5 +128,6 @@ public class ClienteHilo extends Thread{
         fw.close();
         
     }
+    
     
 }

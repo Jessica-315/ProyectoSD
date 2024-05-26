@@ -23,6 +23,7 @@ public class ClienteServidorHilo extends Thread{
     private int puerto;
     private String ip;
     private String nombre;
+    private String mo;
 
     public ClienteServidorHilo(int puerto, String ip, String nombre) {
         this.puerto = puerto;
@@ -32,6 +33,22 @@ public class ClienteServidorHilo extends Thread{
     
     public int getPuerto() {
         return puerto;
+    }
+    
+    public String getMo() {
+        return mo;
+    }
+    
+    public String[] getMoInfUsr(){
+        return mo.split("/");
+    }
+    
+    public int getMoTotalUsr(){
+        return mo.split("/").length;
+    }
+
+    public void setMo(String mo) {
+        this.mo = mo;
     }
     
     @Override
@@ -50,6 +67,7 @@ public class ClienteServidorHilo extends Thread{
             while(escucha){
                 
                 Socket sc = server.accept();
+                
                 DataInputStream in = new DataInputStream(sc.getInputStream());
                 DataOutputStream out = new DataOutputStream(sc.getOutputStream());
                 
@@ -58,11 +76,22 @@ public class ClienteServidorHilo extends Thread{
                 int minutes = locaDate.getMinute();
                 int seconds = locaDate.getSecond();
                 
-                System.out.println("Te envia " + in.readUTF());
-                out.writeUTF(nombre + ": MENSAJE RECIBIDO (" + "Hora: " + hours  + ":"+ minutes +":"+ seconds + ")");
+                String mensaje = in.readUTF();
                 
-                //sc.close();
-                //escucha = false;
+                if(mensaje.contains("Finaliza")){
+                    escucha = false;
+                    System.out.println("Adios");
+                }
+                else if(mensaje.contains(",") && mensaje.contains("/")){    // Se conecta un nuevo usuario
+                    setMo(mensaje);
+                    System.out.println(getMo());
+                }
+                else{
+                    System.out.println("Te envia " + mensaje);
+                    out.writeUTF(nombre + ": MENSAJE RECIBIDO (" + "Hora: " + hours  + ":"+ minutes +":"+ seconds + ")");
+                }
+                
+                sc.close();
                 
             }
             
